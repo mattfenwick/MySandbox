@@ -40,7 +40,7 @@ use Tkx;
 #
 # data definitions:
 #   parsed definition (not sure what lowest common denominator is yet -- find out)
-#     word
+#     actual word from response
 #     definitions
 #     examples
 ###################################
@@ -59,13 +59,13 @@ BEGIN {#set up dictionary names, dictionary url stubs, and functions for accessi
 			
 # Map (dictionary name) urlbase+lookup
 	my %urlstubs = (URB => "http://www.urbandictionary.com/define.php?term=",
-			DIC => "http://dictionary.reference.com/browse/",
-			WRF => "http://www.wordreference.com/enfr/",
-                LED => "http://www.le-dictionnaire.com/definition.php?mot=",
+		DIC => "http://dictionary.reference.com/browse/",
+		WRF => "http://www.wordreference.com/enfr/",
+        LED => "http://www.le-dictionnaire.com/definition.php?mot=",
 		FRW => "http://www.wordreference.com/fren/",
 	);
 
-# could probably be eleminated (just use hash lookup directly)
+# could probably be eliminated (just use hash lookup directly)
 	sub names($) {
 		if (!$_[0]) {
 			die "&names requires a scalar argument: $!";
@@ -75,28 +75,21 @@ BEGIN {#set up dictionary names, dictionary url stubs, and functions for accessi
 		}
 		return $names{$_[0]};
 	}
-	#sub urlstubs($) {
-	#	if (!$_[0]) {
-	#		die "&urlstubs requires a scalar argument: $!";
-	#	}
-	#	if (!exists($urlstubs{$_[0]})) {
-	#		die "&urlstubs entry not found:  invalid dictionary name:  $!";
-	#	}
-	#	return $urlstubs{$_[0]};
-	#}
 
-
+# used by &dic_url to get http responses
 	my $lwp = LWP::UserAgent->new();
 
-	sub dic_url($$) {#search phrase, dictionary
-		if (!exists($urlstubs{$_[1]})) {
+# takes two arguments: search phrase, and dictionary name
+	sub dic_url($$) {
+		my ($search, $dicname) = @_;
+		if (!exists($urlstubs{$search})) {
 			die "no such dictionary:  $_[1] at $!";
 		}
-		my $url = $urlstubs{$_[1]}.$_[0];#it's possible that we need something more robust here in case it's not simply tacked on the end.....
+		my $url = $urlstubs{$search}.$dicname; # we need something more robust here in case it's not simply tacked on the end.....
 		my $content = ${$lwp->get($url)}{_content};
 		return $content;
 	}
-}#end of BEGIN block
+}
 
 
 
@@ -119,84 +112,96 @@ sub simple_gui {
 
 
 BEGIN {#gui code
-my (%widgets, $ent_word, $lab_output, @widgets, @texts, @scrolls);
-my %textvars = (names("URB") => "", names("DIC") => "", names("WRF") => "", names("LED") => "", "entry" => "query:");
-my %dics = (names("URB") => \&urban_parse,
-		names("DIC") => \&dictionary_dot_com_parse,
-		names("WRF") => \&word_reference_parse,
-		names("LED") => \&le_dictionnaire_parse,
-	);
-
-sub submit_query() {
-	for (values %dics) {#iterate over parsing functions
-		(my $query = $textvars{entry}) =~ tr/ /+/;#problem:  multi-word queries are sometimes automatically redirected…. to where?????
-		my @face = @{&{$_}($query, \$widgets{list_wrf})};
-		my $dictionary = shift @face;
-		$widgets{$dictionary}->delete("1.0", "end");
-		if (@face) {
-			#for(my $i = 0; $i <= $#face; $i++) {#  $#face is an arbitrary limit:  do I really need them all?
-			#	$face[$i] = "$textvars{entry}:  $face[$i]";
-			#}
-			$textvars{$dictionary} = join("\n\n", ($dictionary, @face));
- 			$widgets{$dictionary}->insert("end", $textvars{$dictionary});
-		} else {
-			$textvars{$dictionary} = "I'm sorry, $textvars{entry} could not be found in $dictionary\n";
-			$widgets{$dictionary}->insert("end", $textvars{$dictionary});
+	my (%widgets, $ent_word, $lab_output, @widgets, @texts, @scrolls);
+	my %textvars = (names("URB") => "", names("DIC") => "", names("WRF") => "", names("LED") => "", "entry" => "query:");
+	my %dics = (names("URB") => \&urban_parse,
+			names("DIC") => \&dictionary_dot_com_parse,
+			names("WRF") => \&word_reference_parse,
+			names("LED") => \&le_dictionnaire_parse,
+		);
+	
+	# for each parsing function (found in %dics)
+	#   figure out what the desired phrase is, and substitute '+' for ' ' (because that's how urls work)
+	#   get the web page and parse it
+	#   clear text from the widget, then put the new text in (if there is any)
+	sub submit_query() {
+		for my $func (values %dics) {#iterate over parsing functions
+			(my $query = $textvars{entry}) =~ tr/ /+/; # problem:  multi-word queries are sometimes redirected …. to where?????
+			my @face = @{&{$func}($query, \$widgets{'list_wrf'})};
+			my $dictionary = shift @face;
+			$widgets{$dictionary}->delete("1.0", "end");
+			if (@face) {
+				#for(my $i = 0; $i <= $#face; $i++) {#  $#face is an arbitrary limit:  do I really need them all?
+				#	$face[$i] = "$textvars{entry}:  $face[$i]";
+				#}
+				$textvars{$dictionary} = join("\n\n", ($dictionary, @face));
+	 			$widgets{$dictionary}->insert("end", $textvars{$dictionary});
+			} else {
+				$textvars{$dictionary} = "I'm sorry, $textvars{entry} could not be found in $dictionary\n";
+				$widgets{$dictionary}->insert("end", $textvars{$dictionary});
+			}
 		}
 	}
-}
 
-sub make_mainwindow() {
-	my $mw = Tkx::widget->new(".");
-	$mw->g_wm_minsize(200, 200);#what do these 200's mean?  nothing, that's what
-	$mw->g_wm_title("Cross-Dictionnaire");
-	return $mw;
-}
+#####################################################
+# this is all gui-making code
+#   make_mainwindow
+#   make_entry_button_frame
+#   make_label_entry
+#   make_texts
 
-sub make_entry_button_frame($) {
-	my $mw = $_[0];
-	my $frame = $mw->new_frame();
-	$widgets{lab_ent} = &make_label_entry($frame, [-text => "Type entry here:"],[-textvariable => \$textvars{entry}]);
-	$widgets{but_submit} = $frame->new_button(-text => "Submit", -command => [\&submit_query]);
-	$widgets{but_exit} = $frame->new_button(-text => "Exit", -command => sub {exit});
-	my $listvar = " {english->french} {french->english}";
-	$widgets{list_wrf} = $frame->new_tk__listbox(-listvariable => \$listvar);
-
-	$widgets{list_wrf}->g_grid(-row => 15, -padx => 10, -pady => 10);	
-	$widgets{lab_ent}->g_grid(-row => 0, -column => 0, -padx => 10, -pady => 20, -rowspan => 5);
-	$widgets{but_submit}->g_grid(-column => 0, -padx => 10, -pady => 10, -sticky => "ew");
-	$widgets{but_exit}->g_grid(-column => 0, -padx => 10, -pady => 10, -sticky => "ew");
-	return $frame;
-}
-
-sub make_label_entry($\@\@) {
-	my $mw = $_[0];
-	my @label_config = @{$_[1]};
-	my @entry_config = @{$_[2]};
-	my $frame = $mw->new_frame();
-	$widgets{label} = $frame->new_label(@label_config);
-	$widgets{label}->g_grid(-row => 0, -pady => 5);
-	$widgets{entry} = $frame->new_entry(@entry_config);
-	$widgets{entry}->g_grid(-row => 1, -pady => 5);
-	return $frame;
-}
-
-sub make_texts($) {
-	my $mw = $_[0];
-	my $frame = $mw->new_frame();
-	my $i = 0;
-	for my $k ((names("URB"), names("DIC"), names("WRF"), names("LED"))) {
-		$widgets{$k} = $frame->new_tk__text(-width => 100, -height => 10, -wrap => "word");
-		$widgets{"${k}_scroll"} = $frame->new_ttk__scrollbar(-orient => 'vertical', -command => [$widgets{$k}, 'yview']);
-		$widgets{$k}->configur(-yscrollcommand => [$widgets{"${k}_scroll"}, 'set']);
-		$widgets{$k}->g_grid(-row => $i, -column => 0, -pady => 10);
-		$widgets{"${k}_scroll"}->g_grid(-row => $i, -column => 1, -sticky => "ns", -pady => 10);
-		$i++;
+	sub make_mainwindow() {
+		my $mw = Tkx::widget->new(".");
+		$mw->g_wm_minsize(200, 200); # what do these 200's mean?  nothing, that's what
+		$mw->g_wm_title("Cross-Dictionnaire");
+		return $mw;
 	}
-	return $frame;
-}
 
-}# end of BEGIN block
+	sub make_entry_button_frame($) {
+		my $mw = $_[0];
+		my $frame = $mw->new_frame();
+		$widgets{lab_ent} = &make_label_entry($frame, [-text => "Type entry here:"],[-textvariable => \$textvars{entry}]);
+		$widgets{but_submit} = $frame->new_button(-text => "Submit", -command => [\&submit_query]);
+		$widgets{but_exit} = $frame->new_button(-text => "Exit", -command => sub {exit});
+		my $listvar = " {english->french} {french->english}";
+		$widgets{list_wrf} = $frame->new_tk__listbox(-listvariable => \$listvar);
+	
+		$widgets{list_wrf}->g_grid(-row => 15, -padx => 10, -pady => 10);	
+		$widgets{lab_ent}->g_grid(-row => 0, -column => 0, -padx => 10, -pady => 20, -rowspan => 5);
+		$widgets{but_submit}->g_grid(-column => 0, -padx => 10, -pady => 10, -sticky => "ew");
+		$widgets{but_exit}->g_grid(-column => 0, -padx => 10, -pady => 10, -sticky => "ew");
+		return $frame;
+	}
+
+	sub make_label_entry($\@\@) {
+		my $mw = $_[0];
+		my @label_config = @{$_[1]};
+		my @entry_config = @{$_[2]};
+		my $frame = $mw->new_frame();
+		$widgets{label} = $frame->new_label(@label_config);
+		$widgets{label}->g_grid(-row => 0, -pady => 5);
+		$widgets{entry} = $frame->new_entry(@entry_config);
+		$widgets{entry}->g_grid(-row => 1, -pady => 5);
+		return $frame;
+	}
+	
+	# make the widgets that are used for displaying ??the definitions??
+	sub make_texts($) {
+		my $mw = $_[0];
+		my $frame = $mw->new_frame();
+		my $i = 0;
+		for my $k ((names("URB"), names("DIC"), names("WRF"), names("LED"))) {
+			$widgets{$k} = $frame->new_tk__text(-width => 100, -height => 10, -wrap => "word");
+			$widgets{"${k}_scroll"} = $frame->new_ttk__scrollbar(-orient => 'vertical', -command => [$widgets{$k}, 'yview']);
+			$widgets{$k}->configur(-yscrollcommand => [$widgets{"${k}_scroll"}, 'set']);
+			$widgets{$k}->g_grid(-row => $i, -column => 0, -pady => 10);
+			$widgets{"${k}_scroll"}->g_grid(-row => $i, -column => 1, -sticky => "ns", -pady => 10);
+			$i++;
+		}
+		return $frame;
+	}
+
+}
 
 
 
