@@ -1,0 +1,12 @@
+
+ redesign components:
+   parsers:  html response -> parsed definition (or error message if necessary)
+   gui:  provide buttons, text entry fields ... display parsed results
+   http request code:  requested word -> html response
+   glue: connect all the pieces
+
+ data definitions:
+   parsed definition (not sure what lowest common denominator is yet -- find out)
+     actual word from response
+     definitions
+     examples

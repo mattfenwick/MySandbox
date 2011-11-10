@@ -1,0 +1,6 @@
+as of 28.5.10
+
+    wordreference, le-dictionnaire parsing is poor
+
+    urban, dic.com (if not others, too) suggest similar words if word is not found
+        should check to see what words were returned, and warn or something if different from requested word
