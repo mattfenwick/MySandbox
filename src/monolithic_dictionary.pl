@@ -49,18 +49,23 @@ use Tkx;
 
 
 BEGIN {#set up dictionary names, dictionary url stubs, and functions for accessing them safely
+
+# Map (dictionary name) urlstub
 	my %names = (URB => "urbandictionary.com", 
-				DIC => "dictionary.com", 
-				WRF => "wordreference.com", 
-				LED => "le-dictionnaire.com",
-			);
+			DIC => "dictionary.com", 
+			WRF => "wordreference.com", 
+			LED => "le-dictionnaire.com",
+	);
+			
+# Map (dictionary name) urlbase+lookup
 	my %urlstubs = (URB => "http://www.urbandictionary.com/define.php?term=",
-				DIC => "http://dictionary.reference.com/browse/",
-				WRF => "http://www.wordreference.com/enfr/",
+			DIC => "http://dictionary.reference.com/browse/",
+			WRF => "http://www.wordreference.com/enfr/",
                 LED => "http://www.le-dictionnaire.com/definition.php?mot=",
 		FRW => "http://www.wordreference.com/fren/",
-			);
-			
+	);
+
+# could probably be eleminated (just use hash lookup directly)
 	sub names($) {
 		if (!$_[0]) {
 			die "&names requires a scalar argument: $!";
