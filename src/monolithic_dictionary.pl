@@ -31,6 +31,21 @@ use Tkx;
 #	objects:
 #		menu to choose between different websites and modes.......
 
+###################################
+# redesign components:
+#   parsers:  html response -> parsed definition (or error message if necessary)
+#   gui:  provide buttons, text entry fields ... display parsed results
+#   http request code:  requested word -> html response
+#   glue: connect all the pieces
+#
+# data definitions:
+#   parsed definition (not sure what lowest common denominator is yet -- find out)
+#     word
+#     definitions
+#     examples
+###################################
+
+
 
 
 BEGIN {#set up dictionary names, dictionary url stubs, and functions for accessing them safely
@@ -182,7 +197,9 @@ sub make_texts($) {
 
 
 
-
+######################################################################################
+# 'parsers' package
+######################################################################################
 
 ####### response fetchers
 sub urban_parse($) {
@@ -269,7 +286,7 @@ sub le_dictionnaire_parse($) {
 
 
 sub word_ref_supp_parse($) {
-	my @root = $_[0]->find_by_attribute('class', 'se');
+    my @root = $_[0]->find_by_attribute('class', 'se');
 	#print "\n\n".$root[0]->dump()."\n\n";
 	my @word = $root[0]->look_down(_tag => 'span', class => 'hw');
 	my $word = $word[0]->as_text();
@@ -278,7 +295,7 @@ sub word_ref_supp_parse($) {
 	
 	my @lists = $root[0]->look_down(_tag => 'ol', type => 'I');
 	my $temp;
-	if ($lists[0]) {#there is more than one usage....
+	if ($lists[0]) { #there is more than one usage....
 		for(my $j = 0; $j <= $#lists; $j++) {
 			my $li = $lists[$j]->find_by_tag_name('li');
 			my @usage = $li->look_down(_tag => 'span', class => 'ps');
