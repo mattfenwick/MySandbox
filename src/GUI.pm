@@ -5,52 +5,120 @@ use Tkx;
 
 package GUI;
 
-sub make_mainwindow {
-    my $mw = Tkx::widget->new(".");
-    $mw->g_wm_minsize(200, 200); # what do these 200's mean?  nothing, that's what
+## messages to send to controller:
+#    1. search for phrase
+#        'search' button starts it
+#        need to read entry box
+#        future -- also listbox ??
+#    2. exit
+#        exit button starts it
+#
+## messages received:
+#    1. display responses
+#        write to each response display widget
+#
+####### public functions
+# new
+#    class
+#    controller
+# setDefinition
+#    dictionary name
+#    Definition)
+#
+
+my @dictionaries = ("urban", "dict", "word", "ledict");
+my $ARBITRARY_SIZE = 200;
+
+sub new {
+    my ($class, $controller) = @_;
+    my $self = {'mw' => Tkx::widget->new("."),
+        'controller' => $controller
+    };
+    bless($self, $class);
+    my $mw = $self->{'mw'};
+    $mw->g_wm_minsize($ARBITRARY_SIZE, $ARBITRARY_SIZE);
     $mw->g_wm_title("Cross-Dictionnaire");
-    return $mw;
+    
+    my $cFrame = $self->makeControlFrame();
+    my $dFrame = $self->makeTextFrame();
+    
+    $cFrame->g_grid(-row => 0, -column => 0);
+    $dFrame->g_grid(-row => 0, -column => 1);
+    
+    return $self;
 }
 
-sub make_entry_button_frame($) {
-    my $mw = $_[0];
-    my $frame = $mw->new_frame();
-    $widgets{lab_ent} = &make_label_entry($frame, [-text => "Type entry here:"],[-textvariable => \$textvars{entry}]);
-    $widgets{but_submit} = $frame->new_button(-text => "Submit", -command => [\&submit_query]);
-    $widgets{but_exit} = $frame->new_button(-text => "Exit", -command => sub {exit});
-    my $listvar = " {english->french} {french->english}";
-    $widgets{list_wrf} = $frame->new_tk__listbox(-listvariable => \$listvar);
+sub setDefinition {
+    my ($self, $dictName, $def) = @_;
+    $self->{'dicts'}->{$dictName}->delete("1.0", "end");
+    $self->{'dicts'}->{$dictName}->insert("end", $def); # or format the def a bit first 
+}
 
-    $widgets{list_wrf}->g_grid(-row => 15, -padx => 10, -pady => 10);    
-    $widgets{lab_ent}->g_grid(-row => 0, -column => 0, -padx => 10, -pady => 20, -rowspan => 5);
-    $widgets{but_submit}->g_grid(-column => 0, -padx => 10, -pady => 10, -sticky => "ew");
-    $widgets{but_exit}->g_grid(-column => 0, -padx => 10, -pady => 10, -sticky => "ew");
+############## callbacks
+# myExit
+#
+# search
+#
+
+sub myExit {
+    print "exiting now ...";
+    exit; # or forward to controller
+}
+
+sub search {
+    my ($self) = @_;
+    print "I would search for " . $self->{'searchPhrase'} . " if I could\n";
+    for my $dict (@dictionaries) {
+    	$self->setDefinition($dict, $self->{'searchPhrase'} . $dict);
+    }
+#    $self->{'controller'}->search($self->{'searchPhrase'});
+}
+
+############## private functions
+#
+#
+#
+
+sub makeControlFrame {
+    my ($self) = @_;
+    my $frame = $self->{'mw'}->new_frame();
+    $self->{'searchPhrase'} = "";
+    $self->{'labEnt'} = $self->makeLabelEntry($frame->new_frame(),
+        [-text => "Type entry here:"],
+        [-textvariable => \$self->{'searchPhrase'}]);
+    $self->{'submit'} = $frame->new_button(
+        -text => "Submit", 
+        -command => sub {$self->search()} );
+    $self->{'exit'} = $frame->new_button(-text => "Exit", -command => \&myExit);
+
+    $self->{'labEnt'}->g_grid(-row => 0, -column => 0, 
+        -padx => 10, -pady => 20, -rowspan => 5);
+    $self->{'submit'}->g_grid(-column => 0, -padx => 10, -pady => 10, -sticky => "ew");
+    $self->{'exit'}->g_grid(-column => 0, -padx => 10, -pady => 10, -sticky => "ew");
     return $frame;
 }
 
-sub make_label_entry($\@\@) {
-    my $mw = $_[0];
-    my @label_config = @{$_[1]};
-    my @entry_config = @{$_[2]};
-    my $frame = $mw->new_frame();
-    $widgets{label} = $frame->new_label(@label_config);
-    $widgets{label}->g_grid(-row => 0, -pady => 5);
-    $widgets{entry} = $frame->new_entry(@entry_config);
-    $widgets{entry}->g_grid(-row => 1, -pady => 5);
+sub makeLabelEntry {
+    my ($self, $frame, $labConf, $entConf) = @_;
+    $self->{'label'} = $frame->new_label(@$labConf);
+    $self->{'label'}->g_grid(-row => 0, -pady => 5);
+    $self->{'entry'} = $frame->new_entry(@$entConf);
+    $self->{'entry'}->g_grid(-row => 1, -pady => 5);
     return $frame;
 }
 
-# make the widgets that are used for displaying ??the definitions??
-sub make_texts($) {
-    my $mw = $_[0];
-    my $frame = $mw->new_frame();
+sub makeTextFrame {
+    my ($self) = @_;
+    my $frame = $self->{'mw'}->new_frame();
     my $i = 0;
-    for my $k ((names("URB"), names("DIC"), names("WRF"), names("LED"))) {
-        $widgets{$k} = $frame->new_tk__text(-width => 100, -height => 10, -wrap => "word");
-        $widgets{"${k}_scroll"} = $frame->new_ttk__scrollbar(-orient => 'vertical', -command => [$widgets{$k}, 'yview']);
-        $widgets{$k}->configur(-yscrollcommand => [$widgets{"${k}_scroll"}, 'set']);
-        $widgets{$k}->g_grid(-row => $i, -column => 0, -pady => 10);
-        $widgets{"${k}_scroll"}->g_grid(-row => $i, -column => 1, -sticky => "ns", -pady => 10);
+    for my $dict (@dictionaries) {
+        my $text = $frame->new_tk__text(-width => 100, -height => 10, -wrap => "word");
+        my $scroll = $frame->new_ttk__scrollbar(-orient => 'vertical', 
+            -command => [$text, 'yview']);
+        $text->configure(-yscrollcommand => [$scroll, 'set']);
+        $text->g_grid(-row => $i, -column => 0, -pady => 10);
+        $scroll->g_grid(-row => $i, -column => 1, -sticky => "ns", -pady => 10);
+        $self->{'dicts'}->{$dict} = $text;
         $i++;
     }
     return $frame;
