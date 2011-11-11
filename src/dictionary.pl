@@ -3,10 +3,16 @@
 use strict;
 use warnings;
 use Tkx;
+use GUI;
+
+print "hi";
+my $gui = GUI->new(3);
+print "hi";
+&Tkx::MainLoop();
+print "hi";
 
 
-
-&simple_gui();
+# &simple_gui();
 
 
 sub simple_gui {
