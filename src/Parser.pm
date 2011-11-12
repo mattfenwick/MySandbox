@@ -92,9 +92,10 @@ sub wordRefSupp {
     return $temp;
 }
 
-
-sub text_only($) {#given an html element, returns concatenation of all text from its content list
-    my $html_elem = $_[0];
+# given an html element, 
+#    returns concatenation of all text from its content list
+sub text_only {
+    my ($html_elem) = @_;
     my @children = @{${$html_elem}{_content}};
     my $out;
     for my $k (@children) {
@@ -104,3 +105,5 @@ sub text_only($) {#given an html element, returns concatenation of all text from
     }
     return $out;
 }
+
+1;
