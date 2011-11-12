@@ -14,7 +14,7 @@ my %urlstubs = (
 );
 
 my %dics = (
-    'urban'  => \&Parser::urban,
+    'urban'  => \&Parser::urbanDict,
     'word'   => \&Parser::wordRef,
     'ledict' => \&Parser::leDict,
     'dict'   => \&Parser::dicDotCom
@@ -39,8 +39,9 @@ sub getDefinitions {
 
 sub makeURL {
     my ($search, $dicname) = @_;
-    my $url = $urlstubs{$search}.$dicname; # we need something more robust here 
+    my $url = $urlstubs{$dicname}.$search; # we need something more robust here 
     						# in case it's not simply tacked on the end.....
+    print "dict and url: <$dicname> <$url>\n";
     return $url;
 }
 

@@ -65,10 +65,10 @@ sub myExit {
 sub search {
     my ($self) = @_;
     print "I would search for " . $self->{'searchPhrase'} . " if I could\n";
-    for my $dict (@dictionaries) {
-    	$self->setDefinition($dict, $self->{'searchPhrase'} . $dict);
-    }
-#    $self->{'controller'}->search($self->{'searchPhrase'});
+#    for my $dict (@dictionaries) {
+#    	$self->setDefinition($dict, $self->{'searchPhrase'} . $dict);
+#    }
+    $self->{'controller'}->search($self->{'searchPhrase'});
 }
 
 ############## gui set-up methods

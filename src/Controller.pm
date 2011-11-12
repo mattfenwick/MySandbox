@@ -25,3 +25,5 @@ sub search {
 		$self->{'gui'}->setDefinition($dict, $responses{$dict});
 	}
 }
+
+1;
