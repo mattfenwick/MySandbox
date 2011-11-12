@@ -17,17 +17,14 @@ package GUI;
 #    1. display responses
 #        write to each response display widget
 #
-####### public functions
-# new
-#    class
-#    controller
-# setDefinition
-#    dictionary name
-#    Definition)
-#
 
 my @dictionaries = ("urban", "dict", "word", "ledict");
 my $ARBITRARY_SIZE = 200;
+
+####### public methods
+# new
+# setDefinition
+#
 
 sub new {
     my ($class, $controller) = @_;
@@ -74,10 +71,10 @@ sub search {
 #    $self->{'controller'}->search($self->{'searchPhrase'});
 }
 
-############## private functions
-#
-#
-#
+############## gui set-up methods
+# makeControlFrame
+# makeLabelEntry
+# makeTextFrame
 
 sub makeControlFrame {
     my ($self) = @_;
