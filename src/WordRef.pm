@@ -15,7 +15,8 @@ my $dict = "enfr";
 
 my %partsOfSpeech = ('n' => 'noun', 'adv' => 'adverb', 
     'adj' => 'adjective', 'vi' => 'intransitive verb',
-    'vtr' => 'transitive verb', 'nm' => '????');
+    'vtr' => 'transitive verb', 'nm' => '????'
+);
 
 
 sub new {
@@ -33,22 +34,61 @@ sub buildURL {
     return join("/", @fields);
 }
 
-
+# method behavior
+# 1. parse json response into hashes, arrays
+# 2. check if response is an error
+# 3. look for translation in:
+#      json/term0/PrincipalTranslations/0
+#      json/term0/Entries/0  (if not found in other one)
+# 4. pull out of translation:
+#      OriginalTerm/term
+#      OriginalTerm/POS
+#      FirstTranslation/term
+# 
+# error cases
+# 1. text can not be parsed as json -> error/invalid response (expected json)
+# 2. response is an error -> error/no translation found, message/'some explanation'
+# 3. translation found in neither place -> error/got response, could not extract information
+# 4a. can't find word/translation -> error/got translation, could not extract word/translation
+# 4b. can't find pos -> not an error, but needs to be replaced with "sorry, can't find pos"
+#
 sub parseContent {
     my ($self, $content) = @_;
-    my $jsonDict = decode_json($content);
-    my $rel = $jsonDict->{'term0'}->{'PrincipalTranslations'}->{'0'};
-    if(!$rel) { # sometimes it's in `Entries' instead !!!!
-        $rel = $jsonDict->{'term0'}->{'Entries'}->{'0'};
+    
+    my $jsonDict;
+    eval { # error case 1
+        $jsonDict = decode_json($content);
+    } || return {'error' => 'invalid content:  not json'};
+
+    if($jsonDict->{"Error"}) { # error case 2
+    	return {'error' => $jsonDict->{"Error"}};
     }
-#    print "word: " . Dumper($rel) . Dumper($jsonDict->{'term0'}->{'PrincipalTranslations'});
-    my $def = {
-        'word' => $rel->{'OriginalTerm'}->{'term'},
-        'p-o-s' => #$rel->{'OriginalTerm'}->{'POS'}, 
-           $partsOfSpeech{$rel->{'OriginalTerm'}->{'POS'}},
-        'meaning' => $rel->{'FirstTranslation'}->{'term'}
+
+    my $rel = $jsonDict->{'term0'}->{'PrincipalTranslations'}->{'0'} || 
+        $jsonDict->{'term0'}->{'Entries'}->{'0'}; # sometimes in `Entries' instead !!
+    if(!$rel) { # error case 3
+    	return {'error' => 'could not find translation information'};
+    }
+    
+    # error case 4a
+    my $word = $rel->{'OriginalTerm'}->{'term'};
+    if(!$word) {
+    	return {'error' => 'could not find looked-up word in translation'};
+    }
+    my $meaning = $rel->{'FirstTranslation'}->{'term'};
+    if(!$meaning) {
+    	return {'error' => 'could not find meaning in translation'};
+    }
+    
+    # error case 4b
+    my $pos = $partsOfSpeech{$rel->{'OriginalTerm'}->{'POS'}} || $rel->{'OriginalTerm'}->{'POS'};
+
+    # at long last, success!
+    return {
+        'word' => $word,
+        'p-o-s' => $pos,
+        'meaning' => $meaning
     };
-    return $def;
 }
 
 1;
