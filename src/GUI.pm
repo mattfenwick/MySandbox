@@ -18,7 +18,7 @@ package GUI;
 #        write to each response display widget
 #
 
-my @dictionaries = ("urban", "dict", "word", "ledict");
+my @dictionaries = ("urban", "dictDotCom", "wordRef", "leDict");
 my $ARBITRARY_SIZE = 200;
 
 ####### public methods
@@ -48,7 +48,8 @@ sub new {
 sub setDefinition {
     my ($self, $dictName, $def) = @_;
     $self->{'dicts'}->{$dictName}->delete("1.0", "end");
-    $self->{'dicts'}->{$dictName}->insert("end", $def); # or format the def a bit first 
+    use Data::Dumper;
+    $self->{'dicts'}->{$dictName}->insert("end", Dumper($def)); # or format the def a bit first 
 }
 
 ############## callbacks
