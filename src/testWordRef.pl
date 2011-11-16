@@ -10,30 +10,30 @@ my $parser = WordRef->new();
 
 subtest 'undefined input' => sub {
     my $result = $parser->parseContent(undef);
-    ok($result->{"error"} eq 'invalid content:  not json', "dealt with undefined input");
+    is($result->{"error"}, 'invalid content:  not json', "dealt with undefined input");
 };
 
 subtest 'non-json input' => sub {
     my $result = $parser->parseContent("[abc");
-    ok($result->{"error"} eq 'invalid content:  not json', "dealt with non-json input");
+    is($result->{"error"}, 'invalid content:  not json', "dealt with non-json input");
 };
 
 subtest 'input already is error' => sub {
     my $result = $parser->parseContent('{"Error" : "NoTranslation", 
       "Note" : "No translation was found for helllo.Aucune traduction trouvee pour helllo."}');
-    ok($result->{"error"} eq "NoTranslation", "dealt with error in input");
+    is($result->{"error"}, "NoTranslation", "dealt with error in input");
 };
 
 subtest 'missing translation information' => sub {
     my $result = $parser->parseContent('{"term0":{}}');
 #    print Dumper($result);
-    ok($result->{"error"} eq "could not find translation information", 
+    is($result->{"error"}, "could not find translation information", 
         "missing translation information");
 };
 
 subtest 'missing searched-for word' => sub {
     my $result = $parser->parseContent('{"term0": {"PrincipalTranslations": {"0": {} }}}');
-    ok($result->{"error"} eq "could not find looked-up word in translation",
+    is($result->{"error"}, "could not find looked-up word in translation",
         "missing searched-for word");
 };
 

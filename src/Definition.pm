@@ -5,10 +5,14 @@ package Definition;
 use WebUtil;
 use WordRef;
 use Urban;
+use LeDict;
+use DictDotCom;
 
 my %parsers = (
     'wordRef' => WordRef->new(),
-    'urban' => Urban->new()
+    'urban' => Urban->new(),
+    'leDict' => LeDict->new(),
+    'dictDotCom' => DictDotCom->new(),
 );
 
 
