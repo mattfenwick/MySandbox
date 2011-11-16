@@ -19,14 +19,36 @@ sub buildURL {
     return $base . $searchPhrase;
 }
 
+# method behavior
+# 1. parse text into html tree
+# 2. find definition/node
+# 3. extract all spans under the definition/node
+#
+# error cases
+# 1. fail to make html tree (may never happen??)
+# 2. don't find definition/node -> error, could not find definition
+# 3. don't find any spans in definition/node -- not currently checking for this
+#
 sub parseContent {
     my ($self, $content) = @_;
+    
     my $root = &WebUtil::makeTree($content);
-    my @outs = ("le dictionnaire or something");
+    
     my @defs = $root->find_by_attribute("class", "arial-12-gris");
-    push(@outs, $defs[0]->as_text());
-    $root->delete();
-    return \@outs;
+    my $def = $defs[0];
+    if(!$def) {
+        $root->delete();
+        return {'error' => 'could not find definition'};
+    }
+    
+    my @spans = $def->look_down("_tag", "span");
+    my @words;
+    for my $span (@spans) {
+        push(@words, $span->as_text());
+    }
+
+    $root->delete();    
+    return {'definition' => join(' ', @words)};
 }
 
 1;
