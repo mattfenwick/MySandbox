@@ -54,10 +54,10 @@ sub parseContent {
     
     my @egs = $root->find_by_attribute("class", "example");
     my $eg;
-    if(!$egs[0]) { # case 4
+    if(!$egs[0] || !$egs[0]->as_text()) { # case 4
         $eg = "no example found";
     } else {
-        my $eg = $egs[0]->as_text();
+        $eg = $egs[0]->as_text();
     }
     
     $root->delete();
