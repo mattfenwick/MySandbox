@@ -4,7 +4,6 @@ use warnings;
 
 package Urban;
 my $base = "http://www.urbandictionary.com/define.php?term=";
-use Data::Dumper;
 use WebUtil;
 
 sub new {

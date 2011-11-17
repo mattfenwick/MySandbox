@@ -81,12 +81,14 @@ sub parseContent {
     }
     
     # error case 4b
-    my $pos = $partsOfSpeech{$rel->{'OriginalTerm'}->{'POS'}} || $rel->{'OriginalTerm'}->{'POS'};
+    my $pos = $partsOfSpeech{$rel->{'OriginalTerm'}->{'POS'}} || 
+                              $rel->{'OriginalTerm'}->{'POS'} ||
+                              "not found";
 
     # at long last, success!
     return {
         'word' => $word,
-        'p-o-s' => $pos,
+        'part of speech' => $pos,
         'meaning' => $meaning
     };
 }
