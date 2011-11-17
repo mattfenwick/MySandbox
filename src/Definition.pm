@@ -12,7 +12,7 @@ my %parsers = (
     'wordRef' => WordRef->new(),
     'urban' => Urban->new(),
     'leDict' => LeDict->new(),
-    'dictDotCom' => DictDotCom->new(),
+#    'dictDotCom' => DictDotCom->new(),
 );
 
 
