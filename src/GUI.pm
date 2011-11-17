@@ -11,7 +11,7 @@ package GUI;
 #        need to read entry box
 #        future -- also listbox ??
 #    2. exit
-#        exit button starts it
+#        exit button forwards to controller
 #
 ## messages received:
 #    1. display responses
@@ -48,8 +48,7 @@ sub new {
 sub setDefinition {
     my ($self, $dictName, $def) = @_;
     $self->{'dicts'}->{$dictName}->delete("1.0", "end");
-    use Data::Dumper;
-    $self->{'dicts'}->{$dictName}->insert("end", Dumper($def)); # or format the def a bit first 
+    $self->{'dicts'}->{$dictName}->insert("end", $def);
 }
 
 ############## callbacks
@@ -59,16 +58,12 @@ sub setDefinition {
 #
 
 sub myExit {
-    print "exiting now ...";
-    exit; # or forward to controller
+	my ($self) = @_;
+	$self->{'controller'}->myExit();
 }
 
 sub search {
     my ($self) = @_;
-    print "I would search for " . $self->{'searchPhrase'} . " if I could\n";
-#    for my $dict (@dictionaries) {
-#    	$self->setDefinition($dict, $self->{'searchPhrase'} . $dict);
-#    }
     $self->{'controller'}->search($self->{'searchPhrase'});
 }
 
@@ -84,10 +79,13 @@ sub makeControlFrame {
     $self->{'labEnt'} = $self->makeLabelEntry($frame->new_frame(),
         [-text => "Type entry here:"],
         [-textvariable => \$self->{'searchPhrase'}]);
+    
     $self->{'submit'} = $frame->new_button(
         -text => "Submit", 
         -command => sub {$self->search()} );
-    $self->{'exit'} = $frame->new_button(-text => "Exit", -command => \&myExit);
+    $self->{'exit'} = $frame->new_button(
+        -text => "Exit", 
+        -command => sub {$self->myExit()} );
 
     $self->{'labEnt'}->g_grid(-row => 0, -column => 0, 
         -padx => 10, -pady => 20, -rowspan => 5);
