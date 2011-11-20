@@ -1,0 +1,1 @@
+This program is intended to aid the user in producing subtitle files in the common .srt format.  To that end, the GUI allows the user to input text to the various fields in a safe manner:  the program performs a lot of checks to ensure that the user is inputting valid data.

@@ -1,0 +1,118 @@
+<html>
+<head>
+<style type="text/css">
+
+body {
+	color: black;
+}
+
+div.border {
+	border-style:solid;
+	border-width:2px;
+	border-right-style:solid;
+	padding: 5px;
+	margin: 5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div>
+<h1>SubtitleMaker Manual</h1>
+<ol><h3>Table of Contents</h3>
+<li>Purpose of program</li>
+<li>Main GUI specification</li>
+<li>File GUI specification</li>
+<li>Software architecture specification</li>
+</ol>
+</div>
+
+<div class="border">
+<h2>Purpose of program</h2>
+This program is intended to aid the user in producing subtitle files in the common .srt format.  To that end, the GUI allows the user to input text to the various fields in a safe manner:  the program performs a lot of checks to ensure that the user is inputting valid data.
+</div>
+
+<div class="border">
+<h2>Main GUI specification</h2>
+<ul>File menu:
+<li>	Open --
+		opens a dialog box which allows the user to select a file.  If the user cancels, dialog box is closed with no effect.  If the user selects a file which does not conform to the .srt criteria, the dialog box closes with a warning sent to the screen.  If the user selects a valid subtitle file, a new File GUI appears, populated with the data from the file.  See 'File GUI specification' for more information.</li>
+<li>	New --
+		creates a new, empty File GUI.  See 'File GUI specification' for more information.</li>
+<li>	Exit --
+		closes all open File GUIs and exits the application.  Before closing, it asks the user, for each open File GUI with unsaved changes, whether the file should be saved (equivalent to 'Save' option in File GUI).</li>
+</ul>
+<ul>Help menu:
+<li>	Manual --
+		opens this file or directs user to this file.</li>
+<li>	About --
+		displays information about the history and creator of this application.</li>
+</ul>
+</div>
+
+<div class="border">
+<h2>File GUI specification</h2>
+<ul>File menu:
+<li>	Open --
+		opens a dialog box which allows the user to select a file.  If the user cancels, dialog box is closed with no effect.  If the user selects a file which does not conform to the .srt criteria, the dialog box closes with a warning sent to the screen with no other effect.  If the user selects a valid subtitle file, the contents of the current File GUI are replaced with data from the newly opened file.  If there were any unsaved changes before opening a new file, the user is first asked whether he would like to save those changes.</li>
+<li>	Save --
+		saves file to path indicated in title bar, or opens a dialog box asking the user for a new location if there is currently no associated filesystem path.  Notifies the user of the success or failure of the operation.</li>
+<li>	Save as --
+		opens a dialog box asking the user for a new save location.  Saves the file in .srt format to this location.  Notifies the user of the success or failure of the operation.</li>
+<li>	Close --
+		closes the File GUI and its associated file.  If there are unsaved changes, first asks the user whether those changes should be saved.  If the File GUI is associated with a path, that path is used, otherwise, 'Save as' is invoked.</li>
+</ul>
+<ul>Help menu:
+<li>	Manual
+<li>	About
+</ul>
+<ul>Explanation of the different parts of the FileGUI
+<li>	title bar
+		displays the path to the file.  If there is none (i.e. 'New' was invoked from the main GUI), displays 'Untitled'.  Otherwise displays path of opened file (if a file was opened), or path to most recent save location.  Note: if 'Save' is invoked from the File menu, this save path will be used.</li>
+<li>	line index</li>
+<li>	start/stop times</li>
+<li>	add/replace/edit/remove buttons</li>
+<li>	text entry</li>
+<li>	text display</li>
+</ul>
+<ul>Explanation of the effects of the four buttons
+<li>	add</li>
+<li>	remove</li>
+<li>	edit</li>
+<li>	replace</li>
+</ul>
+<ul>Miscellaneous
+<li>	assocation of a File GUI with a filesystem path</li>
+</ul>
+</div>
+
+<div class="border">
+<h2>Software architecture specification</h2>
+<ul>Modules
+<li>MainController</li>
+<li>MainGUI</li>
+<li>FileController</li>
+<li>FileGUI</li>
+<li>ParsingUtilities</li>
+<li>Data</li>
+</ul>
+<ul>Domain-specific objects
+<li>SRTQuote</li>
+<li>SRTTime</li>
+<li>SRTEntry</li>
+</ul>
+<ul>Incidental objects
+<li>LabelEntry</li>
+</ul>
+
+<ul><h3>Communication</h3>
+<li>events</li>
+<li>only FileGUI and ParsingUtilities create and consume SRTEntry(s) : Data and FileController merely pass them around</li>
+</ul>
+</div>
+
+</body>
+
+</html>
