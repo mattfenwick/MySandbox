@@ -1,0 +1,36 @@
+{-background background Background SystemWindow SystemWindow} 
+{-bd -borderwidth} 
+{-bg -background} 
+{-borderwidth borderWidth BorderWidth 1 1} 
+{-cursor cursor Cursor xterm xterm} 
+{-disabledbackground disabledBackground DisabledBackground SystemButtonFace SystemButtonFace} 
+{-disabledforeground disabledForeground DisabledForeground SystemDisabledText SystemDisabledText} 
+{-exportselection exportSelection ExportSelection 1 1} 
+{-fg -foreground} 
+{-font font Font TkTextFont TkTextFont} 
+{-foreground foreground Foreground SystemWindowText SystemWindowText} 
+{-highlightbackground highlightBackground HighlightBackground SystemButtonFace SystemButtonFace} 
+{-highlightcolor highlightColor HighlightColor SystemWindowFrame SystemWindowFrame} 
+{-highlightthickness highlightThickness HighlightThickness 0 0} 
+{-insertbackground insertBackground Foreground SystemWindowText SystemWindowText} 
+{-insertborderwidth insertBorderWidth BorderWidth 0 0} 
+{-insertofftime insertOffTime OffTime 300 300} 
+{-insertontime insertOnTime OnTime 600 600} 
+{-insertwidth insertWidth InsertWidth 2 2} 
+{-invalidcommand invalidCommand InvalidCommand {} {}} 
+{-invcmd -invalidcommand} 
+{-justify justify Justify left left} 
+{-readonlybackground readonlyBackground ReadonlyBackground SystemButtonFace SystemButtonFace} 
+{-relief relief Relief sunken sunken} 
+{-selectbackground selectBackground Foreground SystemHighlight SystemHighlight} 
+{-selectborderwidth selectBorderWidth BorderWidth 0 0} 
+{-selectforeground selectForeground Background SystemHighlightText SystemHighlightText} 
+{-show show Show {} {}} 
+{-state state State normal normal} 
+{-takefocus takeFocus TakeFocus {} {}} 
+{-textvariable textVariable Variable {} ::perl::SCALAR(0x5804c6c)} 
+{-validate validate Validate none key} 
+{-validatecommand validateCommand ValidateCommand {} ::perl::CODE(0x5804a1c)} 
+{-vcmd -validatecommand} 
+{-width width Width 20 20} 
+{-xscrollcommand xScrollCommand ScrollCommand {} {}}
