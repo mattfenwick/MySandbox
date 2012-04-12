@@ -1,6 +1,0 @@
-changed action when pressing 'delete' button while editing transactions:
-	widgets will be populated with values from first transaction in last
-	previously, widgets were NOT repopulated after transaction deleted --
-		the old values remained but the id selector was reset
-	(so this assumes there is at least one transaction)
-	
