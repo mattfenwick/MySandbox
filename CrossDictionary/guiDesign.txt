@@ -1,0 +1,18 @@
+
+gui:  version 1:
+    objects:
+        1. widget for text entry
+        2. widget that displays websites that will be checked
+        3. widget for displaying results (no choice, just displays all)
+        4. button to submit?
+        5. button to exit
+        something to save responses?--not in first version
+    operation:
+        type something in to 1, press enter or click a button
+        which sends query to each website listed in 2, gets response, parses,
+        and displays in 3
+
+
+version 2:
+    objects:
+        menu to choose between different websites and modes.......
