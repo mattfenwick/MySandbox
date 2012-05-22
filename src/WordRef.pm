@@ -9,7 +9,7 @@ use Data::Dumper;
 
 my $base = "http://api.wordreference.com";
 my $apiVersion = "";
-my $apiKey = "";
+my $apiKey = "fc60c";
 my $output = "json";
 my $dict = "enfr";
 

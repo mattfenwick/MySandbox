@@ -1,0 +1,21 @@
+
+
+high priority:
+----------------------------
+- "funny characters" not being printed correctly in GUI
+- look in to replacing spaces with '+'s -- this seems EXTREMELY error-prone
+- work on precise meaning of a "definition"
+- make sure it's clear which definition is associated with which dictionary in the GUI!!
+
+
+low priority:
+-----------------------------
+- get moving with the dictionary.com API -- still waiting on response from their end
+- unit tests should follow perl conventions
+- text encoding:  display weird characters in Tk text box
+    
+    
+completed:
+-----------------------------  
+- work on urban parsing
+- grab data from a "definition" and display in GUI (currently just Dumper-ing)
