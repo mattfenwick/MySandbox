@@ -6,23 +6,29 @@ use Data::Dumper;
 
 my $gui = Tkx::widget->new(".");
 
+#$gui->g_wm_maxsize(600, 400);
+
 my $frame = $gui->new_frame(-height => 200, -width => 200);
-$frame->g_place(-relheight => 1, -relwidth => .9);
+$frame->g_grid(-row => 0, -column => 0);#place(-relheight => 1, -relwidth => .9);
 #print($frame->config() . "\n\n");
-my $cav = $frame->new_canvas();#-height => 4000, -width => 4000);
-$cav->g_place(-relheight => 1, -relwidth => 1);
 
-my $scrollbar = $frame->new_ttk__scrollbar(-orient => 'vertical', 
-        -command => [$frame, 'yview']);
-$cav->configure(-yscrollcommand => [$scrollbar, 'set']);
-$scrollbar->g_place(-relx => .9, -width => 20, -height => 400);
+$gui->columnconfigure(0, -weight => 1);
 
-for my $x (1 .. 10) {
+my $canv = $frame->new_tk__canvas(-scrollregion => "0 0 1000 1000");
+$canv->g_grid();#place(-relheight => 1, -relwidth => 1);
+
+my $scrollbar = $gui->new_ttk__scrollbar(-orient => 'vertical', 
+        -command => [$canv, 'yview']);
+$canv->configure(-yscrollcommand => [$scrollbar, 'set']);
+$scrollbar->g_grid(-column => 1, -row => 0, -sticky => 'ns');
+  #place(-relx => .9, -width => 20, -height => 400);
+
+for my $x (0 .. 10) {
     print "x: $x\n";
-    $cav->new_ttk__button(
+    $canv->new_ttk__button(
         -text => "some text $x", -width => 50
-    )->g_place(
-        -rely => ($x - 1) / 5, -height => 20, -relwidth => .75
+    )->g_grid(#)place(
+        #-y => 60 * $x, -height => 60, -relwidth => .75
     );#-sticky => 'nsew');
 }
 
